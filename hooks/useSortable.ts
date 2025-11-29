@@ -518,7 +518,6 @@ export function useSortable<T>(
       right: 0,
       top: top.value,
       zIndex: movingSV.value ? 1 : 0,
-      backgroundColor: "#000000",
       shadowColor: "black",
       shadowOpacity: withSpring(movingSV.value ? 0.2 : 0),
       shadowRadius: 10,
