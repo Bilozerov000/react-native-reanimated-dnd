@@ -217,18 +217,32 @@ export function useSortableList<TData extends { id: string }>(
   const autoScroll = useSharedValue(ScrollDirection.None);
   const scrollViewRef = useAnimatedRef();
   const dropProviderRef = useRef<DropProviderRef>(null);
+  
+  // Add a flag to prevent feedback loop
+  const isUserScrolling = useSharedValue(false);
 
-  // Scrolling synchronization
+  // Scrolling synchronization - only for programmatic scrolling
   useAnimatedReaction(
     () => scrollY.value,
     (scrolling) => {
-      scrollTo(scrollViewRef, 0, scrolling, false);
+      if (!isUserScrolling.value) {
+        scrollTo(scrollViewRef, 0, scrolling, false);
+      }
     }
   );
 
   // Handle scroll events
-  const handleScroll = useAnimatedScrollHandler((event) => {
-    scrollY.value = event.contentOffset.y;
+  const handleScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      isUserScrolling.value = true;
+      scrollY.value = event.contentOffset.y;
+    },
+    onEndDrag: () => {
+      isUserScrolling.value = false;
+    },
+    onMomentumEnd: () => {
+      isUserScrolling.value = false;
+    },
   });
 
   const handleScrollEnd = useCallback(() => {
