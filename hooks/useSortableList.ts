@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import {
   scrollTo,
   useAnimatedReaction,
@@ -299,7 +299,3 @@ export function useSortableList<TData extends { id: string }>(
     getItemProps,
   };
 }
-function useEffect(arg0: () => void, arg1: any[]) {
-  throw new Error("Function not implemented.");
-}
-
