@@ -197,6 +197,7 @@ export function useSortableList<TData extends { id: string }>(
   options: UseSortableListOptions<TData>
 ): UseSortableListReturn<TData> {
   const { data, itemHeight, itemKeyExtractor = (item) => item.id } = options;
+  
 
   // Runtime validation in development mode
   if (__DEV__) {
@@ -217,6 +218,11 @@ export function useSortableList<TData extends { id: string }>(
   const autoScroll = useSharedValue(ScrollDirection.None);
   const scrollViewRef = useAnimatedRef();
   const dropProviderRef = useRef<DropProviderRef>(null);
+
+  // Update positions when data changes (e.g. after a drop operation)
+  useEffect(() => {
+    positions.value = listToObject(data);
+  }, [data, positions]);
   
   // Add a flag to prevent feedback loop
   const isUserScrolling = useSharedValue(false);
@@ -233,12 +239,19 @@ export function useSortableList<TData extends { id: string }>(
 
   // Handle scroll events
   const handleScroll = useAnimatedScrollHandler({
-    onScroll: (event) => {
+    onBeginDrag: () => {
       isUserScrolling.value = true;
-      scrollY.value = event.contentOffset.y;
+    },
+    onScroll: (event) => {
+      if (isUserScrolling.value) {
+        scrollY.value = event.contentOffset.y;
+      }
     },
     onEndDrag: () => {
       isUserScrolling.value = false;
+    },
+    onMomentumBegin: () => {
+      isUserScrolling.value = true;
     },
     onMomentumEnd: () => {
       isUserScrolling.value = false;
@@ -286,3 +299,7 @@ export function useSortableList<TData extends { id: string }>(
     getItemProps,
   };
 }
+function useEffect(arg0: () => void, arg1: any[]) {
+  throw new Error("Function not implemented.");
+}
+

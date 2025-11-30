@@ -366,13 +366,11 @@ function SortableComponent<TData extends { id: string }>({
 
 export const Sortable = memo(
   ({ data, renderItem, ...props }: SortableProps<any>) => {
-    const dataHashKey = dataHash(data);
     return (
       <SortableComponent
         data={data}
         renderItem={renderItem}
         {...props}
-        key={dataHashKey}
       />
     );
   }
