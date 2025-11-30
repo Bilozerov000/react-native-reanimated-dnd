@@ -214,15 +214,15 @@ export function useSortableList<TData extends { id: string }>(
 
   // Set up shared values
   const positions = useSharedValue(listToObject(data));
-  const scrollY = useSharedValue(0);
-  const autoScroll = useSharedValue(ScrollDirection.None);
-  const scrollViewRef = useAnimatedRef();
-  const dropProviderRef = useRef<DropProviderRef>(null);
-
   // Update positions when data changes (e.g. after a drop operation)
   useEffect(() => {
     positions.value = listToObject(data);
   }, [data, positions]);
+
+  const scrollY = useSharedValue(0);
+  const autoScroll = useSharedValue(ScrollDirection.None);
+  const scrollViewRef = useAnimatedRef();
+  const dropProviderRef = useRef<DropProviderRef>(null);
   
   // Add a flag to prevent feedback loop
   const isUserScrolling = useSharedValue(false);
