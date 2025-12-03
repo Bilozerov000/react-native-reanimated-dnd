@@ -288,13 +288,13 @@ export function useSortable<T>(
   const THROTTLE_INTERVAL = 50; // milliseconds
 
   const initialTopVal = useMemo(() => {
-    const posArr = positions.get();
+    const posArr = positions.value;
     const pos = posArr?.[id];
-    return pos * itemHeight;
+    return typeof pos === "number" ? pos * itemHeight : 0;
   }, []);
 
   const initialLowerBoundVal = useMemo(() => {
-    return lowerBound.get();
+    return lowerBound.value;
   }, []);
 
   const positionY = useSharedValue(initialTopVal);
@@ -406,20 +406,20 @@ export function useSortable<T>(
   useAnimatedReaction(
     () => positions.value[id],
     (currentPosition, previousPosition) => {
-      if (
-        currentPosition !== null &&
-        previousPosition !== null &&
-        currentPosition !== previousPosition
-      ) {
+      if (currentPosition !== null && currentPosition !== previousPosition) {
         if (!movingSV.value) {
           top.value = withSpring(currentPosition * itemHeight);
-          if (onMove) {
+          if (
+            onMove &&
+            previousPosition !== null &&
+            previousPosition !== undefined
+          ) {
             scheduleOnRN(onMove, id, previousPosition, currentPosition);
           }
         }
       }
     },
-    [movingSV]
+    [movingSV, itemHeight, onMove, id, top]
   );
 
   useAnimatedReaction(
@@ -449,7 +449,14 @@ export function useSortable<T>(
           }
         }
       }
-    }
+    },
+    [
+      targetLowerBound,
+      lowerBound,
+      itemsCount,
+      itemHeight,
+      calculatedContainerHeight,
+    ]
   );
 
   useAnimatedReaction(
@@ -465,7 +472,7 @@ export function useSortable<T>(
         }
       }
     },
-    [movingSV]
+    [movingSV, lowerBound]
   );
 
   const panGestureHandler = Gesture.Pan()
@@ -522,7 +529,7 @@ export function useSortable<T>(
       shadowOpacity: withSpring(movingSV.value ? 0.2 : 0),
       shadowRadius: 10,
     };
-  }, [movingSV]);
+  }, [movingSV, top]);
 
   return {
     animatedStyle,
